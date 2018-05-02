@@ -190,7 +190,23 @@ INSERT INTO HORARIO_MONITOR VALUES(38, '16179')
 
 SELECT * FROM HORARIO_MONITOR
 
+GO
+CREATE PROCEDURE sp_select_horario_monitor
+AS
 SELECT M.raMonitor, M.nome, H.diaDaSemana, H.horario 
 FROM MONITOR M, HORARIO H, HORARIO_MONITOR HM    
 WHERE HM.idHorario = H.idHorario and
 	  HM.raMonitor = M.raMonitor
+
+exec sp_select_horario_monitor
+
+GO
+CREATE PROCEDURE sp_select_horario_monitor_ra
+@ra varchar(5)
+AS
+SELECT M.raMonitor, M.nome, H.diaDaSemana, H.horario 
+FROM MONITOR M, HORARIO H, HORARIO_MONITOR HM    
+WHERE HM.idHorario = H.idHorario and
+	  HM.raMonitor = M.raMonitor and
+	  M.raMonitor = @ra
+exec sp_select_horario_monitor_ra '16179'

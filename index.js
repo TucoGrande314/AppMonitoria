@@ -31,16 +31,19 @@ router.get('/monitor', (req, res) =>{
 
 router.get('/monitor/:ra?', (req, res) =>{
     let filter = '';
-    if(req.params.ra) filter = ' WHERE raMonitor=' + parseInt(req.params.ra);
-    execSQLQuery('SELECT FROM Monitor' + filter, res);
+    if(req.params.ra) filter = ' WHERE raMonitor= \''  + parseInt(req.params.ra)+'\'';
+    execSQLQuery('SELECT * FROM Monitor' + filter, res);
 })
 router.get('/horario', (req, res) =>{
     execSQLQuery('SELECT * FROM Horario', res);
 })
 router.get('/horarioMonitor', (req, res) =>{
-    var string = 'SELECT M.raMonitor, M.nome, H.diaDaSemana, H.horario'+ 
-                 'FROM MONITOR M, HORARIO H, HORARIO_MONITOR HM'+    
-                  'WHERE HM.idHorario = H.idHorario and'+
-                  'HM.raMonitor = M.raMonitor';
+    var string = 'exec sp_select_horario_monitor';
     execSQLQuery(string, res);
+})
+router.get('/horarioMonitor/:ra?', (req, res) =>{
+    let filter = '';
+    if(req.params.ra) filter = '\''+parseInt(req.params.ra)+'\'';
+    var string = 'exec sp_select_horario_monitor_ra ';
+    execSQLQuery(string+filter, res);
 })
