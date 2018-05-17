@@ -5,6 +5,7 @@ const port = 18000;
 const sql = require("mssql");
 const connStr = "Server=regulus;User Id=BD16167;Password=BD16167;";
 const router = express.Router();
+const ip = "177.220.18.71" ;
 
 sql.connect(connStr)
 .then(conn => global.conn = conn)
@@ -16,13 +17,13 @@ router.get('/', (req, res) => res.json({ message: 'Funcionando!' }));
 app.use('/', router);
 
 function execSQLQuery(sqlQry, res){
-    GLOBAL.conn.request()
+    global.conn.request()
                .query(sqlQry)
                .then(result => res.json(result.recordset))
                .catch(err => res.json(err));
 }
 
-app.listen(port, () => 
+app.listen(port, ip, () => 
     console.log('API is running on port '+ port));
 
 router.get('/monitor', (req, res) =>{
