@@ -1,11 +1,10 @@
 const express = require('express');
 const app = express();
 const bodyParser= require('body-parser');
-const port = 18000;
+const port = 8040;
 const sql = require("mssql");
 const connStr = "Server=regulus;User Id=BD16167;Password=BD16167;";
 const router = express.Router();
-const ip = "177.220.18.71" ;
 
 sql.connect(connStr)
 .then(conn => global.conn = conn)
@@ -13,7 +12,6 @@ sql.connect(connStr)
 
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
-router.get('/', (req, res) => res.json({ message: 'Funcionando!' }));
 app.use('/', router);
 
 function execSQLQuery(sqlQry, res){
@@ -23,28 +21,38 @@ function execSQLQuery(sqlQry, res){
                .catch(err => res.json(err));
 }
 
-app.listen(port, ip, () => 
+app.listen(port, () => 
     console.log('API is running on port '+ port));
 
-router.get('/monitor', (req, res) =>{
-     execSQLQuery('SELECT * FROM Monitor', res);
+
+router.get('/', (req, res) => {
+    res.json({ message: 'Funcionando!' });
+});
+                
+
+router.get('/Lanche', (req, res) =>{
+     execSQLQuery('SELECT * FROM LANCHE', res);
 })
 
-router.get('/monitor/:ra?', (req, res) =>{
+router.get('/Lanche/:Id?', (req, res) =>{
     let filter = '';
-    if(req.params.ra) filter = ' WHERE raMonitor= \''  + parseInt(req.params.ra)+'\'';
-    execSQLQuery('SELECT * FROM Monitor' + filter, res);
+    if(req.params.Id) filter = ' WHERE IdLanche= \''  + parseInt(req.params.Id)+'\'';
+    execSQLQuery('SELECT * FROM LANCHE' + filter, res);
 })
-router.get('/horario', (req, res) =>{
-    execSQLQuery('SELECT * FROM Horario', res);
+router.get('/acompanhamento', (req, res) =>{
+    execSQLQuery('SELECT * FROM ACOMPANHAMENTO', res);
 })
-router.get('/horarioMonitor', (req, res) =>{
-    var string = 'exec sp_select_horario_monitor';
-    execSQLQuery(string, res);
+router.get('/acompanhamento/:Id?', (req, res) =>{
+    if(req.params.Id) filter = ' WHERE IdAcompanhamento= \''  + parseInt(req.params.Id)+'\'';
+    execSQLQuery('SELECT * FROM ACOMPANHAMENTO' + filter, res);
 })
-router.get('/horarioMonitor/:ra?', (req, res) =>{
+router.get('/pedido/:IdLanche?/:IdAcompanhamento?', (req, res) => {
     let filter = '';
-    if(req.params.ra) filter = '\''+parseInt(req.params.ra)+'\'';
-    var string = 'exec sp_select_horario_monitor_ra ';
-    execSQLQuery(string+filter, res);
+    if(req.params.IdLanche){ 
+        filter += parseInt(req.params.IdLanche);
+        if(req.params.IdAcompanhamento){ 
+            filter+= ', ' + parseInt(req.params.IdAcompanhamento);
+            execSQLQuery('exec sp_pedido '+ filter, res);
+        }
+    }
 })
